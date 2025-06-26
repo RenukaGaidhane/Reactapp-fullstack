@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: backend
-        image: 809581002932.dkr.ecr.ap-south-1.amazonaws.com/react-app-backend
+        image: 809581002932.dkr.ecr.ap-south-1.amazonaws.com/react-backend
         ports:
         - containerPort: 5000
         env:
@@ -28,6 +28,7 @@ metadata:
   name: backend
   namespace: react-app
 spec:
+  type: LoadBalancer
   selector:
     app: backend
   ports:
