@@ -13,8 +13,8 @@ jobs:
     env:
       AWS_REGION: ${{ secrets.AWS_REGION }}
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-      FRONTEND_REPO: react-app-frontend
-      BACKEND_REPO: react-app-backend
+      FRONTEND_REPO: react-frontend
+      BACKEND_REPO: react-backend
 
     steps:
     - name: Checkout Code
