@@ -14,13 +14,13 @@ spec:
         app: backend
     spec:
       containers:
-      - name: backend
-        image: 809581002932.dkr.ecr.ap-south-1.amazonaws.com/react-backend:latest
+        - name: backend
+          image: 809581002932.dkr.ecr.ap-south-1.amazonaws.com/react-backend:latest
         ports:
-         - containerPort: 5000
+          - containerPort: 5000
         env:
-         - name: MONGO_URL
-           value: mongodb://mongo:27017/mydb
+          - name: MONGO_URL
+            value: mongodb://mongo:27017/mydb
 ---
 apiVersion: v1
 kind: Service
