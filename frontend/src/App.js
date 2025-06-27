@@ -27,7 +27,7 @@ const App = () => {
 
   return (
     <div>
-      <h1>REACT-APP-Deployment</h1>
+      <h1>REACT-APP-Deploy</h1>
       <input value={name} onChange={e => setName(e.target.value)} />
       <button onClick={addItem}>Add</button>
       <ul>
