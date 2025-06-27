@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: mongo
-        image: 809581002932.dkr.ecr.ap-south-1.amazonaws.com/react-mongo
+        image: 809581002932.dkr.ecr.ap-south-1.amazonaws.com/react-mongo:latest
         ports:
         - containerPort: 27017
 ---
