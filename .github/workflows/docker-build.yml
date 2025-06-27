@@ -1,4 +1,4 @@
-name: Build and Push to Amazon ECR
+name: Build, Push to ECR, and Deploy to EKS
 
 on:
   push:
@@ -7,38 +7,47 @@ on:
       - master
 
 jobs:
-  build-and-push:
+  deploy:
+    name: Build and Deploy
     runs-on: ubuntu-latest
 
     env:
       AWS_REGION: ${{ secrets.AWS_REGION }}
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-      FRONTEND_REPO: react-frontend
-      BACKEND_REPO: react-backend
+      FRONTEND_REPO: react-app-frontend
+      BACKEND_REPO: react-app-backend
+      EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER_NAME }}
 
     steps:
     - name: Checkout Code
       uses: actions/checkout@v3
 
-    - name: Configure AWS credentials
+    - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v2
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ secrets.AWS_REGION }}
+        aws-region: ${{ env.AWS_REGION }}
 
-    - name: Log in to Amazon ECR
-      id: login-ecr
+    - name: Login to Amazon ECR
       uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Build and Push Frontend Image to ECR
+    - name: Build and Push Frontend to ECR
       run: |
         FRONTEND_IMAGE="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${FRONTEND_REPO}:latest"
         docker build -t $FRONTEND_IMAGE ./frontend
         docker push $FRONTEND_IMAGE
 
-    - name: Build and Push Backend Image to ECR
+    - name: Build and Push Backend to ECR
       run: |
         BACKEND_IMAGE="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${BACKEND_REPO}:latest"
         docker build -t $BACKEND_IMAGE ./backend
         docker push $BACKEND_IMAGE
+
+    - name: Update kubeconfig
+      run: |
+        aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER_NAME
+
+    - name: Deploy to EKS
+      run: |
+        kubectl apply -f manifest/
