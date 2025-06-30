@@ -57,9 +57,12 @@ jobs:
         sed -i "s|image: .*${BACKEND_REPO}:.*|image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${BACKEND_REPO}:${COMMIT_SHA}|" manifest/backend-deployment.yaml
 
     - name: Commit updated manifests
+      env:
+        GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
       run: |
         git config user.name "github-actions"
         git config user.email "github-actions@github.com"
+        git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}       
         git add manifest/
         git commit -m "Update image tags to $COMMIT_SHA"
         git push origin main
