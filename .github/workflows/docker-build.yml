@@ -32,22 +32,37 @@ jobs:
     - name: Login to Amazon ECR
       uses: aws-actions/amazon-ecr-login@v1
 
+
+    - name: Set Commit SHA
+      run: echo "COMMIT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+     
+
     - name: Build and Push Frontend to ECR
       run: |
-        FRONTEND_IMAGE="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${FRONTEND_REPO}:latest"
+        FRONTEND_IMAGE="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${FRONTEND_REPO}:${COMMIT_SHA}"
         docker build -t $FRONTEND_IMAGE ./frontend
         docker push $FRONTEND_IMAGE
 
-    - name: Update image tags in Kubernetes manifests
-      run: |
-        sed -i "s|image: $BACKEND_IMAGE:.*|image: $BACKEND_IMAGE:$COMMIT_SHA|" manifest/backend-deployment.yaml
-        sed -i "s|image: $FRONTEND_IMAGE:.*|image: $FRONTEND_IMAGE:$COMMIT_SHA|" manifest/frontend-deployment.yaml
 
     - name: Build and Push Backend to ECR
       run: |
-        BACKEND_IMAGE="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${BACKEND_REPO}:latest"
+        BACKEND_IMAGE="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${BACKEND_REPO}:${COMMIT_SHA}"
         docker build -t $BACKEND_IMAGE ./backend
         docker push $BACKEND_IMAGE
+
+
+    - name: Update image tags in Kubernetes manifests
+      run: |
+        sed -i "s|image: .*${FRONTEND_REPO}:.*|image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${FRONTEND_REPO}:${COMMIT_SHA}|" manifest/frontend-deployment.yaml
+        sed -i "s|image: .*${BACKEND_REPO}:.*|image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${BACKEND_REPO}:${COMMIT_SHA}|" manifest/backend-deployment.yaml
+
+    - name: Commit updated manifests
+      run: |
+        git config user.name "github-actions"
+        git config user.email "github-actions@github.com"
+        git add manifest/
+        git commit -m "Update image tags to $COMMIT_SHA"
+        git push origin main
 
     - name: Update kubeconfig
       run: |
