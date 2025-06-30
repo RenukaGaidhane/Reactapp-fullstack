@@ -58,11 +58,11 @@ jobs:
 
     - name: Commit updated manifests
       env:
-        PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         git config user.name "github-actions"
         git config user.email "github-actions@github.com"
-        git remote set-url origin https://x-access-token:${PAT_TOKEN}@github.com/${{ github.repository }}       
+        git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}       
         git add manifest/
         git commit -m "Update image tags to $COMMIT_SHA"
         git push origin main
