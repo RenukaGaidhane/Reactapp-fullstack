@@ -38,6 +38,11 @@ jobs:
         docker build -t $FRONTEND_IMAGE ./frontend
         docker push $FRONTEND_IMAGE
 
+    - name: Update image tags in Kubernetes manifests
+      run: |
+        sed -i "s|image: $BACKEND_IMAGE:.*|image: $BACKEND_IMAGE:$COMMIT_SHA|" manifest/backend-deployment.yaml
+        sed -i "s|image: $FRONTEND_IMAGE:.*|image: $FRONTEND_IMAGE:$COMMIT_SHA|" manifest/frontend-deployment.yaml
+
     - name: Build and Push Backend to ECR
       run: |
         BACKEND_IMAGE="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${BACKEND_REPO}:latest"
