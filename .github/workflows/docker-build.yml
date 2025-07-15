@@ -33,7 +33,7 @@ jobs:
           sonarsource/sonar-scanner-cli:latest \
           -Dsonar.projectKey=react-app \
           -Dsonar.sources=. \
-          -Dsonar.projectName=React App \
+          -Dsonar.projectName=React-App \
           -Dsonar.sourceEncoding=UTF-8
 
     - name: Configure AWS Credentials
