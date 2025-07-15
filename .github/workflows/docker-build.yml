@@ -14,13 +14,27 @@ jobs:
     env:
       AWS_REGION: ${{ secrets.AWS_REGION }}
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-      FRONTEND_REPO: react-frontend
-      BACKEND_REPO: react-backend
+      FRONTEND_REPO: react-app-frontend
+      BACKEND_REPO: react-app-backend
       EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER_NAME }}
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
     steps:
     - name: Checkout Code
       uses: actions/checkout@v3
+
+    - name: SonarQube Scan
+      run: |
+        docker run --rm \
+          -e SONAR_HOST_URL=${SONAR_HOST_URL} \
+          -e SONAR_LOGIN=${SONAR_TOKEN} \
+          -v ${{ github.workspace }}:/usr/src \
+          sonarsource/sonar-scanner-cli:latest \
+          -Dsonar.projectKey=react-app \
+          -Dsonar.sources=. \
+          -Dsonar.projectName=React App \
+          -Dsonar.sourceEncoding=UTF-8
 
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v2
