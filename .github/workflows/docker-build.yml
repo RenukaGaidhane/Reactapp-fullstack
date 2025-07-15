@@ -31,9 +31,9 @@ jobs:
           -e SONAR_LOGIN=${SONAR_TOKEN} \
           -v ${{ github.workspace }}:/usr/src \
           sonarsource/sonar-scanner-cli:latest \
-          -Dsonar.projectKey=react-app \
+          -Dsonar.projectKey=sonnar \
           -Dsonar.sources=. \
-          -Dsonar.projectName=React-App \
+          -Dsonar.projectName=sonar \
           -Dsonar.sourceEncoding=UTF-8
 
     - name: Configure AWS Credentials
